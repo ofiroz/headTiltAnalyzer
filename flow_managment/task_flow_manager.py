@@ -1,7 +1,17 @@
+from abc import abstractmethod
 
+class TaskFlowManager:
 
-class FlowManager:
     @staticmethod
     @abstractmethod
-    def init_parsing_file(file_object, document_id, tenant_id, document_name, state: AtomicState) -> AtomicState:
+    def flow():
+        """
+        Runs the entire task step by step.
+        Steps will be specified in each implementation.
+        """
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def clean_task():
         pass

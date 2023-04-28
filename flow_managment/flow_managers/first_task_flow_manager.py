@@ -1,28 +1,54 @@
+from IO_operations.eyes_detection_record import append_detections_to_text_file
+from flow_managment.task_flow_manager import TaskFlowManager
 from configuration.config import EYE_DETECTION_CASCADE
 import numpy as np
 import cv2
 
-eyeCascade = cv2.CascadeClassifier(EYE_DETECTION_CASCADE)
 
-video_capture = cv2.VideoCapture(1)
+class FirstTaskFlowManager(TaskFlowManager):
 
-while True:
-    # Capture frame-by-frame
-    ret, frame = video_capture.read()
+    def __init__(self):
+        self.eye_cascade = cv2.CascadeClassifier(EYE_DETECTION_CASCADE)
+        self.default_camera_port = 1  # todo: change to 0
+        self.capture = cv2.VideoCapture(self.default_camera_port)
+        self.transparency = 0.2
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    def _get_eye_box_list(self, frame, scaleFactor=1.3, minNeighbors=5):
+        # The following method returns the coordinates for every eye detected
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        return self.eye_cascade.detectMultiScale(gray, scaleFactor, minNeighbors)
 
-    eyes = eyeCascade.detectMultiScale(gray, 1.3, 5)
-    # Draw a rectangle around the faces
-    for (x, y, w, h) in eyes:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+    def _brighten_eye_box(self, frame):
+        # TODO
+        return frame
 
-    # Display the resulting frame
-    cv2.imshow('Video', frame)
+    def _analyze_live_feed(self):
+        """
+        The following method gets 'live' frames from the configured camera port.
+        The eyes in each frame will be brighten and every detection will be recorded using append_detections_to_text_file function
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        * press 'q' to continue.
+        """
+        while True:
+            _, frame = self.capture.read()
+            overlay = frame.copy()
+            eyes = self._get_eye_box_list(frame)
+            for (x, y, w, h) in eyes:
+                cv2.rectangle(overlay, (x, y), (x+w, y+h), (255, 255, 255), -1)
+            frame = cv2.addWeighted(overlay, self.transparency, frame, 1 - self.transparency, 0)
+            cv2.imshow('LiveVideo', frame)
 
-# When everything is done, release the capture
-video_capture.release()
-cv2.destroyAllWindows()
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+    def flow(self):
+        # todo: log
+        self._analyze_live_feed()
+        self.clean_task()
+        # todo: log
+
+    def clean_task(self):
+        self.capture.release()
+        cv2.destroyAllWindows()
+
+FirstTaskFlowManager().flow()
