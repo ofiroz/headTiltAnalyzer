@@ -6,6 +6,12 @@ from configuration import config
 mention the need for a production ready and scalable project in the readme 
 """
 
+task_list = [1, 2]
+
 
 def main():
+
+    for task in task_list:
+        MainFlowManager().handle_task(task_id=task)
+
     pass

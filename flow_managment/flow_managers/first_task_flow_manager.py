@@ -44,6 +44,7 @@ class FirstTaskFlowManager(TaskFlowManager):
             eyes = self._get_eye_box_list(frame)
             if SAVE_FRAMES and self._detected(eyes):
                 self.frame_list.append(frame)
+                # TODO: EXTRACT 1 FRAME (~10TH) AND SAVE ONLY IT (OVERRIDE FRAME_LIST). THEN FIND THE DETECTION FLAG
             overlay = self._brighten_detected_box(eyes, frame)
             frame = cv2.addWeighted(overlay, self.transparency, frame, 1 - self.transparency, 0)
             cv2.imshow('LiveVideo', frame)
@@ -64,4 +65,4 @@ class FirstTaskFlowManager(TaskFlowManager):
         self.capture.release()
         cv2.destroyAllWindows()
 
-# FirstTaskFlowManager().flow()
+FirstTaskFlowManager().flow()

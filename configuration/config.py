@@ -9,4 +9,4 @@ EYE_DETECTION_CASCADE_PATH = os.path.join(CASCADES_PATH, 'haarcascade_eye.xml')
 DETECTION_RECORDS_PATH = os.path.join(CASCADES_PATH, 'haarcascade_eye.xml')
 
 CAMERA_PORT = 1  # todo
-SAVE_FRAMES = False  # todo
+SAVE_FRAMES = True  # todo
