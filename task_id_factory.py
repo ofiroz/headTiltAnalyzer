@@ -13,5 +13,5 @@ class TaskIdFactory:
             eval_string = '()' if not static else ''
             return eval(f'{task_id}{instance}{eval_string}')
         except Exception as e:
-            msg = f'unable to initiate instance: {task_id}, {instance}'
+            msg = f'unable to initiate instance: {task_id}, {instance}. error: {e}'
             raise NotImplementedError(msg)
