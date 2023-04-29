@@ -10,16 +10,16 @@ import cv2
 class FirstTaskFlowManager(TaskFlowManager):
 
     def __init__(self):
-        self.eye_cascade = cv2.CascadeClassifier(EYE_DETECTION_CASCADE_PATH)
-        self.default_camera_port = CAMERA_PORT
-        self.capture = cv2.VideoCapture(self.default_camera_port)
-        self.transparency = 0.2
-        self.frame_list: list[np.ndarray] = []
+        self._eye_cascade = cv2.CascadeClassifier(EYE_DETECTION_CASCADE_PATH)
+        self._default_camera_port = CAMERA_PORT
+        self._capture = cv2.VideoCapture(self._default_camera_port)
+        self._transparency = 0.3
+        self._frame_list: list[np.ndarray] = []
 
     def _get_eye_box_list(self, frame, scaleFactor=1.3, minNeighbors=5):
         # The following method returns the coordinates for every eye detected
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        return self.eye_cascade.detectMultiScale(gray, scaleFactor, minNeighbors)
+        return self._eye_cascade.detectMultiScale(gray, scaleFactor, minNeighbors)
 
     def _brighten_detected_box(self, det_list, frame):
         overlay = frame.copy()
@@ -40,19 +40,18 @@ class FirstTaskFlowManager(TaskFlowManager):
         ** FYI, SAVE_FRAME flag is True by default todo
         """
         while True:
-            _, frame = self.capture.read()
+            _, frame = self._capture.read()
             eyes = self._get_eye_box_list(frame)
             if SAVE_FRAMES and self._detected(eyes):
-                self.frame_list.append(frame)
-                # TODO: EXTRACT 1 FRAME (~10TH) AND SAVE ONLY IT (OVERRIDE FRAME_LIST). THEN FIND THE DETECTION FLAG
+                self._frame_list.append(frame.copy())
             overlay = self._brighten_detected_box(eyes, frame)
-            frame = cv2.addWeighted(overlay, self.transparency, frame, 1 - self.transparency, 0)
+            frame = cv2.addWeighted(overlay, self._transparency, frame, 1 - self._transparency, 0)
             cv2.imshow('LiveVideo', frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 if SAVE_FRAMES:
-                    # append_detections_to_text_file(r'C:\Users\ofir\Downloads\ttt.txt', self.frame_list)
-                    create_new_thread(append_detections_to_text_file, filepath=r'C:\Users\ofir\Downloads\ttt.txt', single_frame_dets=self.frame_list)
+                    # append_detections_to_text_file(DETECTION_RECORDS_PATH, self._frame_list)
+                    create_new_thread(append_detections_to_text_file, filepath=DETECTION_RECORDS_PATH, single_frame_dets=self._frame_list)
                 break
 
     def flow(self):
@@ -62,7 +61,7 @@ class FirstTaskFlowManager(TaskFlowManager):
         # todo: log
 
     def clean_task(self):
-        self.capture.release()
+        self._capture.release()
         cv2.destroyAllWindows()
 
 FirstTaskFlowManager().flow()
