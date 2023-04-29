@@ -9,6 +9,9 @@ class MainFlowManager:
         # todo: init logger
         try:
             flow_manager: TaskFlowManager = TaskIdFactory.get_instance(str(task_id), 'FlowManager')
+            if not flow_manager:
+                raise Exception("Flow manager creation failed")
+            flow_manager.flow()
 
         except KeyError as e:
             print('task failed')
