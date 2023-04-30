@@ -6,6 +6,9 @@ import numpy as np
 import time
 import cv2
 
+import sys
+np.set_printoptions(threshold=sys.maxsize)  # needed for writing the full frame and not a truncated representation
+
 
 class FirstTaskFlowManager(TaskFlowManager):
 
